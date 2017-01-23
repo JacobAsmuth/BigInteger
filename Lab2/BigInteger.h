@@ -30,14 +30,8 @@ public:
 	BigInteger( string value );
 
 	double log( uint32_t base );
-	bool is_probable_prime( uint32_t accuracy );
 	inline bool even() const { return ( _bits[0] % 2 ) == 0; }
 	inline bool odd() const { return ( _bits[0] % 2 ) != 0; }
-
-	//fast compute ( this.pow( exp ) % mod )
-	//good for huge values of exp
-	BigInteger mod_pow( const BigInteger& exp, const BigInteger& mod ) const;
-
 
 	//Returns true/false if the object is negative/positive
 	inline bool negative() const { return _negative; }
@@ -141,7 +135,6 @@ public:
 
 	operator string() const { return to_string(); }
 
-
 private:
 	const static uint32_t bits_per_value = sizeof( uint32_t ) * 8;
 	
@@ -149,19 +142,10 @@ private:
 
 	//Returns the index of the first set bit, starting from least significant bit working upwards
 	uint32_t get_lowest_set_bit();
-	//mod_pow on odd numbers.
-	BigInteger odd_mod_pow( const BigInteger& exp, const BigInteger& mod ) const;
-
-	//this->pow( exponent ) % ( 1 << p ) shortcut/optimization
-	BigInteger mod_pow2( const BigInteger& exp, int p ) const;
-	//this % (1 << p ) shortcut/optimization
-	BigInteger mod2( int p ) const;
 
 	BigInteger internal_add( const BigInteger& rhs ) const;
 	BigInteger internal_sub( const BigInteger& rhs ) const;
 	void trim();
-
-	bool passes_miller_rabin( uint32_t iterations );
 
 	static inline vector<uint32_t>* bigger_array( const vector<uint32_t>& _1, const vector<uint32_t>& _2 );
 	static inline vector<uint32_t>* smaller_array( const vector<uint32_t>& _1, const vector<uint32_t>& _2 );

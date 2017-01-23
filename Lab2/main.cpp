@@ -6,12 +6,11 @@ using std::cin;
 #include <string>
 using std::string;
 #include <math.h>
+#include "randutils.hpp"
 
 int main()
 {
-	BigInteger a( "70000000" );
-
-
+	BigInteger a( 12345678 );
 
 	BigInteger _1, _2;
 	uint32_t choice;

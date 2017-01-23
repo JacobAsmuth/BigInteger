@@ -119,54 +119,6 @@ double BigInteger::log( uint32_t base )
 	else return this->log2() / std::log2( base );
 }
 
-bool BigInteger::is_probable_prime( uint32_t accuracy )
-{
-	if( accuracy == 0 )
-		return true; //lol technicalities
-
-	BigInteger this_abs = this->abs();
-
-	if( this_abs == TWO )
-		return true;
-	if( this_abs.even() || this_abs == ONE )
-		return false;
-
-	uint32_t rounds = 0;
-	uint32_t n = ( min( accuracy, UINT32_MAX - 1 ) + 1 ) / 2;
-	uint32_t bits = bits_used();
-
-	if( bits < 100 )
-		return passes_miller_rabin( min( 50U, n ) );
-
-	if( bits < 256 )
-		rounds = 27;
-	else if( bits < 512 )
-		rounds = 15;
-	else if( bits < 768 )
-		rounds = 8;
-	else if( bits < 1024 )
-		rounds = 4;
-	else rounds = 2;
-
-	return passes_miller_rabin( min( n, rounds ) );
-}
-
-BigInteger BigInteger::mod_pow( const BigInteger& exp, const BigInteger& mod ) const
-{
-	if( mod <= ZERO )
-		throw new exception( "Modulus must be positive" );
-
-	if( exp == ZERO )
-		return mod == ONE ? ZERO : ONE;
-	if( *this == ONE )
-		return mod == ONE ? ZERO : ONE;
-	if( *this == ZERO && exp >= ZERO )
-		return ZERO;
-
-	BigInteger exponent = exp.abs();
-	bool negative_result = exp._negative;
-}
-
 BigInteger BigInteger::operator+( const BigInteger & rhs ) const
 {
 	if( this->_negative && rhs._negative )
@@ -613,25 +565,6 @@ uint32_t BigInteger::get_lowest_set_bit()
 	return -1;
 }
 
-BigInteger BigInteger::odd_mod_pow( const BigInteger& exp, const BigInteger& mod ) const
-{
-	return BigInteger();
-}
-
-BigInteger BigInteger::mod_pow2( const BigInteger& exp, int p ) const
-{
-	BigInteger res = ONE;
-	//BigInteger base_
-}
-
-BigInteger BigInteger::mod2( int p ) const
-{
-	if( bits_used() <= p )
-		return *this;
-
-	int num_ints = ( p + 31 ) >> 5;
-}
-
 BigInteger BigInteger::internal_add( const BigInteger & rhs ) const
 {
 	//If they're equal, bigger will be this->_bits, and smaller will be rhs._bits
@@ -756,32 +689,6 @@ void BigInteger::trim()
 {
 	while( _bits.size() > 1 && _bits.back() == 0 )
 		_bits.pop_back();
-}
-
-bool BigInteger::passes_miller_rabin( uint32_t iterations )
-{
-	BigInteger this_minus_one = *this - ONE;
-	BigInteger m = this_minus_one;
-	int a = get_lowest_set_bit();
-	m <<= a;
-
-	while( iterations-- > 0 )
-	{
-		BigInteger b;
-		do
-		{
-			b = BigInteger::random( this->bits_used(), true );
-		} while( b != ZERO && b < *this );
-
-		uint32_t j = 0;
-		BigInteger z = b.mod_pow( m, *this );
-		while( !( ( j == 0 && z ==  ONE ) || z == this_minus_one ) ) {
-            if( j > 0 && z == ONE || ++j == a )
-                return false;
-            z = z.mod_pow( TWO, *this );
-		}
-	}
-	return true;
 }
 
 //If they're equal, this function returns &_1
